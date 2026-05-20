@@ -14,28 +14,31 @@ pipeline {
      stage ('Checkout'){
 	steps{
           git branch: 'main',
+		  credentialsId: 'github-creds',
 	  url: 'https://github.com/mohamedzaid111/Jenkins_Test02.git'
-	   }
-
-	}
-
-     stage ('Restore'){
-	 steps{
-          sh 'dotnet restore'
 	   }
 
 	}
 
      stage ('Build'){
 	steps{
-          sh 'dotnet build --configuration Release'
+		  sh 'find . -name "*.sln"'
+
+		  dir ('WebApplication1'){
+			  sh 'dotnet restore'
+			  sh 'dotnet build --configuration Release'
+		  }
 	   }
 
       }
 
      stage ('Run unit tests'){
 	steps{
-          sh 'dotnet test'
+          sh 'find . -name "*.sln"'
+
+		  dir ('WebApplication1'){
+			  sh 'dotnet test --configuration Release --no-build'
+		  }
 	   }
 
       }
@@ -72,8 +75,8 @@ pipeline {
 
                     ],
 
-                    keyVaultURL: 'https://jenkins-kv01.vault.azure.net/',
-                    credentialID: 'azure-sp'
+                    keyVaultURLOverride: 'https://jenkins-kv01.vault.azure.net/',
+                    credentialIDOverride: 'azure-sp'
                 ) {
 
                     sh '''
